@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Course.dart';
+import '../services/api_service.dart';
+import 'coursedetailscreen.dart';
 
 class ClassesScreen extends StatefulWidget {
   const ClassesScreen({super.key});
@@ -11,11 +13,13 @@ class ClassesScreen extends StatefulWidget {
 class _ClassesScreenState extends State<ClassesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late Future<ApiCoursesResult> _coursesFuture;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _coursesFuture = ApiService.instance.fetchCourses();
   }
 
   @override
@@ -181,11 +185,42 @@ class _ClassesScreenState extends State<ClassesScreen>
         controller: _tabController,
         children: [
           // Available Classes
-          ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: availableCourses.length,
-            itemBuilder: (context, index) {
-              return _buildClassCard(availableCourses[index], true);
+          FutureBuilder<ApiCoursesResult>(
+            future: _coursesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return _buildErrorState(
+                  snapshot.error.toString(),
+                  onRetry: () {
+                    setState(() {
+                      _coursesFuture = ApiService.instance.fetchCourses();
+                    });
+                  },
+                );
+              }
+              final data = snapshot.data;
+              final courses = data?.courses ?? [];
+              if (courses.isEmpty) {
+                return _buildEmptyState();
+              }
+              return Column(
+                children: [
+                  if (data != null && data.fromCache)
+                    _buildCacheBanner(),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: courses.length,
+                      itemBuilder: (context, index) {
+                        return _buildClassCard(courses[index], true);
+                      },
+                    ),
+                  ),
+                ],
+              );
             },
           ),
           // Downloaded Classes
@@ -202,65 +237,75 @@ class _ClassesScreenState extends State<ClassesScreen>
   }
 
   Widget _buildClassCard(Course course, bool isAvailable) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(course.image, style: const TextStyle(fontSize: 18)),
-            ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CourseDetailScreen(course: course),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  course.title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(course.image, style: const TextStyle(fontSize: 18)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    course.title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  course.instructor,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${course.lessons ?? 0} Lessons',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    course.instructor,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${course.lessons ?? 0} Lessons',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 24,
-            height: 24,
-            decoration: const BoxDecoration(
-              color: Colors.teal,
-              shape: BoxShape.circle,
+            const SizedBox(width: 8),
+            Container(
+              width: 24,
+              height: 24,
+              decoration: const BoxDecoration(
+                color: Colors.teal,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Icon(Icons.check, color: Colors.white, size: 16),
+              ),
             ),
-            child: const Center(
-              child: Icon(Icons.check, color: Colors.white, size: 16),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -355,6 +400,51 @@ class _ClassesScreenState extends State<ClassesScreen>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Text(
+        'No courses available right now.',
+        style: TextStyle(color: Colors.grey[600]),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message, {required VoidCallback onRetry}) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.red[700]),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: onRetry,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCacheBanner() {
+    return Container(
+      width: double.infinity,
+      color: Colors.amber[50],
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: const Text(
+        'Showing cached data (offline).',
+        style: TextStyle(fontSize: 12, color: Colors.brown),
       ),
     );
   }

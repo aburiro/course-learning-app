@@ -28,4 +28,40 @@ class Course {
     required this.videoId,
     required this.description,
   });
+
+  factory Course.fromJson(Map<String, dynamic> json) {
+    return Course(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      title: (json['title'] as String?) ?? 'Untitled',
+      instructor: (json['instructor'] as String?) ?? 'Unknown',
+      image: (json['image'] as String?) ?? '',
+      lessons: (json['lessons'] as num?)?.toInt(),
+      isDownloaded: json['isDownloaded'] as bool?,
+      progress: (json['progress'] as num?)?.toDouble(),
+      isEnrolled: json['isEnrolled'] as bool?,
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
+      students: (json['students'] as num?)?.toInt() ?? 0,
+      price: (json['price'] as num?)?.toInt() ?? 0,
+      videoId: (json['videoId'] as String?) ?? '',
+      description: (json['description'] as String?) ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'instructor': instructor,
+      'image': image,
+      'lessons': lessons,
+      'isDownloaded': isDownloaded,
+      'progress': progress,
+      'isEnrolled': isEnrolled,
+      'rating': rating,
+      'students': students,
+      'price': price,
+      'videoId': videoId,
+      'description': description,
+    };
+  }
 }
