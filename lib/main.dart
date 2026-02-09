@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'firebase/firebase_init.dart';
+import 'services/notification_service.dart';
+import 'services/permission_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/welcome_screen.dart';
 import "screens/onboarding_screen.dart";
@@ -20,6 +22,8 @@ import 'screens/Course.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseInit.init();
+  await NotificationService.instance.init();
+  await PermissionService.instance.requestNotificationPermission();
   runApp(const MyApp());
 }
 

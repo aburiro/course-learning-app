@@ -58,6 +58,7 @@ dependencies:
   cloud_firestore: any
   firebase_storage: ^11.3.0
   firebase_messaging: ^14.7.0
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

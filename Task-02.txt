@@ -15,3 +15,15 @@ Foreground, background & terminated state
 & debugging Responsive UI (different screen sizes) App performance basics 
 & optimization Clean project structure & reusable widgets Build APK &
  basic deployment Final real-world Flutter + Firebase application
+
+
+
+
+Push notifications (FCM)
+Foreground/background/terminated notification handling
+Permissions handling (storage/notification)
+API integration & basic HTTP requests
+Error handling & debugging
+App performance basics & optimization
+Build APK & basic deployment
+Final real‑world Flutter + Firebase application
