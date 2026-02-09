@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/auth_widgets.dart';
 import '../services/local_storage_service.dart';
+import '../firebase/auth_service.dart';
+import '../firebase/firestore_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -165,14 +167,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: ElevatedButton(
                   onPressed: _agreeToTerms
                       ? () async {
-                          await LocalStorageService.instance.saveUserProfile(
-                            name: _nameController.text.trim(),
-                            email: _emailController.text.trim(),
-                          );
-                          if (!mounted) {
+                          final name = _nameController.text.trim();
+                          final email = _emailController.text.trim();
+                          final password = _passwordController.text;
+                          final confirmPassword =
+                              _confirmPasswordController.text;
+                          if (name.isEmpty ||
+                              email.isEmpty ||
+                              password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please fill all fields.'),
+                              ),
+                            );
                             return;
                           }
-                          Navigator.pushNamed(context, '/login_screen');
+                          if (password != confirmPassword) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Passwords do not match.'),
+                              ),
+                            );
+                            return;
+                          }
+                          try {
+                            final credential =
+                                await AuthService.instance.signUpWithEmail(
+                              email: email,
+                              password: password,
+                            );
+                            await LocalStorageService.instance.saveUserProfile(
+                              name: name,
+                              email: email,
+                            );
+                            await FirestoreService.instance.createOrUpdateUser(
+                              credential.user!.uid,
+                              name: name,
+                              email: email,
+                            );
+                            if (!mounted) {
+                              return;
+                            }
+                            Navigator.pushNamed(context, '/login_screen');
+                          } catch (e) {
+                            if (!mounted) {
+                              return;
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Sign up failed: $e')),
+                            );
+                          }
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

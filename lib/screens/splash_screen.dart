@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/local_storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,7 +19,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _bootstrap() async {
     await LocalStorageService.instance.init();
     await Future.delayed(const Duration(seconds: 2));
-    final isLoggedIn = await LocalStorageService.instance.isLoggedIn();
+    final isLoggedIn = FirebaseAuth.instance.currentUser != null ||
+        await LocalStorageService.instance.isLoggedIn();
     if (!mounted) {
       return;
     }

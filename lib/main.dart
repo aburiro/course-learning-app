@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'firebase/firebase_init.dart';
 import 'screens/splash_screen.dart';
 import 'screens/welcome_screen.dart';
 import "screens/onboarding_screen.dart";
@@ -16,7 +17,9 @@ import 'screens/progress_screen.dart';
 import 'screens/coursedetailscreen.dart';
 import 'screens/Course.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FirebaseInit.init();
   runApp(const MyApp());
 }
 

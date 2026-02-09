@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/auth_widgets.dart';
 import '../services/local_storage_service.dart';
+import '../firebase/auth_service.dart';
+import '../firebase/firestore_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -105,14 +107,42 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    await LocalStorageService.instance.setLoggedIn(true);
-                    await LocalStorageService.instance.saveUserProfile(
-                      email: _emailController.text.trim(),
-                    );
-                    if (!mounted) {
+                    final email = _emailController.text.trim();
+                    final password = _passwordController.text;
+                    if (email.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please enter email and password.'),
+                        ),
+                      );
                       return;
                     }
-                    Navigator.pushNamed(context, '/dashboard_screen');
+                    try {
+                      final credential =
+                          await AuthService.instance.signInWithEmail(
+                        email: email,
+                        password: password,
+                      );
+                      await LocalStorageService.instance.setLoggedIn(true);
+                      await LocalStorageService.instance.saveUserProfile(
+                        email: email,
+                      );
+                      await FirestoreService.instance.createOrUpdateUser(
+                        credential.user!.uid,
+                        email: email,
+                      );
+                      if (!mounted) {
+                        return;
+                      }
+                      Navigator.pushNamed(context, '/dashboard_screen');
+                    } catch (e) {
+                      if (!mounted) {
+                        return;
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Login failed: $e')),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1ABC9C),

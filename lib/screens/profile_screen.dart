@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/local_storage_service.dart';
+import '../firebase/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -113,11 +114,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildMenuTile('Downloads', Icons.download),
                   _buildMenuTile('Settings', Icons.settings),
                   _buildMenuTile('Help & Support', Icons.help),
-                  _buildMenuTile(
-                    'Logout',
-                    Icons.logout,
-                    color: Colors.red,
-                    onTap: () async {
+                    _buildMenuTile(
+                      'Logout',
+                      Icons.logout,
+                      color: Colors.red,
+                      onTap: () async {
+                      await AuthService.instance.signOut();
                       await LocalStorageService.instance.clearSession();
                       if (!mounted) {
                         return;
