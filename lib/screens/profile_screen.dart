@@ -1,7 +1,38 @@
 import 'package:flutter/material.dart';
+import '../services/local_storage_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _name = 'John Doe';
+  String _email = 'john@example.com';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final name = await LocalStorageService.instance.getUserName();
+    final email = await LocalStorageService.instance.getUserEmail();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      if (name != null && name.trim().isNotEmpty) {
+        _name = name.trim();
+      }
+      if (email != null && email.trim().isNotEmpty) {
+        _email = email.trim();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +71,9 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'John Doe',
-                    style: TextStyle(
+                  Text(
+                    _name,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -50,7 +81,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'john@example.com',
+                    _email,
                     style: TextStyle(fontSize: 12, color: Colors.white70),
                   ),
                 ],
@@ -82,7 +113,22 @@ class ProfileScreen extends StatelessWidget {
                   _buildMenuTile('Downloads', Icons.download),
                   _buildMenuTile('Settings', Icons.settings),
                   _buildMenuTile('Help & Support', Icons.help),
-                  _buildMenuTile('Logout', Icons.logout, color: Colors.red),
+                  _buildMenuTile(
+                    'Logout',
+                    Icons.logout,
+                    color: Colors.red,
+                    onTap: () async {
+                      await LocalStorageService.instance.clearSession();
+                      if (!mounted) {
+                        return;
+                      }
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/login_screen',
+                        (route) => false,
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -113,9 +159,10 @@ class ProfileScreen extends StatelessWidget {
     String title,
     IconData icon, {
     Color color = Colors.black,
+    VoidCallback? onTap,
   }) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),

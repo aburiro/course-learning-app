@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/local_storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -11,9 +12,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushNamed(context, '/onboarding_screen');
-    });
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    await LocalStorageService.instance.init();
+    await Future.delayed(const Duration(seconds: 2));
+    final isLoggedIn = await LocalStorageService.instance.isLoggedIn();
+    if (!mounted) {
+      return;
+    }
+    Navigator.pushReplacementNamed(
+      context,
+      isLoggedIn ? '/dashboard_screen' : '/onboarding_screen',
+    );
   }
 
   @override

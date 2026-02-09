@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/auth_widgets.dart';
+import '../services/local_storage_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -163,7 +164,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _agreeToTerms
-                      ? () {
+                      ? () async {
+                          await LocalStorageService.instance.saveUserProfile(
+                            name: _nameController.text.trim(),
+                            email: _emailController.text.trim(),
+                          );
+                          if (!mounted) {
+                            return;
+                          }
                           Navigator.pushNamed(context, '/login_screen');
                         }
                       : null,

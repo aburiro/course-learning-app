@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/auth_widgets.dart';
+import '../services/local_storage_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -103,7 +104,14 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await LocalStorageService.instance.setLoggedIn(true);
+                    await LocalStorageService.instance.saveUserProfile(
+                      email: _emailController.text.trim(),
+                    );
+                    if (!mounted) {
+                      return;
+                    }
                     Navigator.pushNamed(context, '/dashboard_screen');
                   },
                   style: ElevatedButton.styleFrom(
