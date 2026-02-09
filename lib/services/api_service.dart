@@ -25,8 +25,7 @@ class ApiService {
 
   static final ApiService instance = ApiService._();
 
-  static const String coursesEndpoint =
-      'https://example.com/api/courses.json';
+  static const String coursesEndpoint = 'https://example.com/api/courses.json';
   static const String _cacheKey = 'api_courses_cache_v1';
 
   Future<ApiCoursesResult> fetchCourses() async {
