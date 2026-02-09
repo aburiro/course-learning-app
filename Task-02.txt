@@ -1,0 +1,17 @@
+Task Description
+Widgets lifecycle (Stateless  Stateful) UI design
+ (Row, Column, Stack, Container, Forms, Assets, Fonts) 
+Material & Cupertino widgets Navigation, routes & screen flow Bottom navigation
+ & drawers State management (setState – basics) 
+Form validation & 
+user input handling Local storage (SharedPreferences & session handling) 
+Firebase project setup (Android  iOS) Firebase Authentication (EmailPassword, user session) 
+Firestore database (Collections, Documents, CRUD, real-time updates) 
+Firebase Storage (ImageFile upload & download) Push notifications 
+(Firebase Cloud Messaging) 
+Foreground, background & terminated state
+ notifications Permissions handling (storage, notification) API integration 
+& basic HTTP requests Error handling 
+& debugging Responsive UI (different screen sizes) App performance basics 
+& optimization Clean project structure & reusable widgets Build APK &
+ basic deployment Final real-world Flutter + Firebase application
