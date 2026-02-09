@@ -39,14 +39,18 @@ class ApiService {
       }
       final decoded = jsonDecode(response.body);
       final list = _extractCourseList(decoded);
-      final courses = list.map(Course.fromJson).toList();
+      final courses = list
+          .map((item) => Course.fromJson(item as Map<String, dynamic>))
+          .toList();
       await _saveCache(list);
       return ApiCoursesResult(courses: courses, fromCache: false);
     } catch (e) {
       debugPrint('API error: $e');
       final cached = await _loadCache();
       if (cached != null) {
-        final courses = cached.map(Course.fromJson).toList();
+        final courses = cached
+            .map((item) => Course.fromJson(item as Map<String, dynamic>))
+            .toList();
         return ApiCoursesResult(courses: courses, fromCache: true);
       }
       throw ApiServiceException(
