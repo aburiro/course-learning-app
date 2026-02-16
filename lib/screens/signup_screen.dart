@@ -5,7 +5,7 @@ import '../firebase/auth_service.dart';
 import '../firebase/firestore_service.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();

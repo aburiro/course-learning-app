@@ -5,7 +5,7 @@ import '../firebase/auth_service.dart';
 import '../firebase/firestore_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
