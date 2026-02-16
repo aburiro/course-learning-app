@@ -110,7 +110,7 @@ class CourseDetailsPage extends StatelessWidget {
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Enrolled successfully!'),
+                              content: Text('Enrolled successfully'),
                             ),
                           );
                         },
