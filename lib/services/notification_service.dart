@@ -1,5 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-
+import '../firebase/firebase_init.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -20,11 +20,7 @@ class NotificationService {
   }
 
   Future<void> requestPermission() async {
-    await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    await _messaging.requestPermission(alert: true, badge: true, sound: true);
   }
 
   Future<String?> getToken() async {
@@ -46,6 +42,7 @@ class NotificationService {
     if (message == null) {
       return;
     }
-    // Handle notification that opened the app from terminated state.
+
+    // Handle notification \tap when app is terminated.
   }
 }
