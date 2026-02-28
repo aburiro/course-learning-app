@@ -2,9 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
   LocalStorageService._();
-
   static final LocalStorageService instance = LocalStorageService._();
-
   static const String _keyIsLoggedIn = 'is_logged_in';
   static const String _keyUserName = 'user_name';
   static const String _keyUserEmail = 'user_email';
@@ -32,7 +30,10 @@ class LocalStorageService {
     final prefs = await _ensurePrefs();
     await prefs.setBool(_keyIsLoggedIn, value);
     if (value) {
-      await prefs.setInt(_keyLastLoginAt, DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(
+        _keyLastLoginAt,
+        DateTime.now().millisecondsSinceEpoch,
+      );
     }
   }
 
