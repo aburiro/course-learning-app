@@ -5,7 +5,6 @@ import '../firebase/firebase_init.dart';
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await FirebaseInit.init();
 }
-
 class NotificationService {
   NotificationService._();
 
