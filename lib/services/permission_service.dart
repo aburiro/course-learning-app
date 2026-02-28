@@ -2,7 +2,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 class PermissionService {
   PermissionService._();
-
   static final PermissionService instance = PermissionService._();
 
   Future<bool> requestNotificationPermission() async {
